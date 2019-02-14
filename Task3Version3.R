@@ -1,6 +1,6 @@
 # Module 2 - Task 3: Multiple Regression in R
 # Alican Tanaçan
-# Version 2 - Creating Models for 3StarReviews, PositiveServiceReview, RecommendProduct
+# Version 3 - Creating Models for 2StarReviews, PositiveServiceReview, RecommendProduct
 # with 0.75 data partition.
 
 ## Libraries ----
@@ -29,15 +29,18 @@ ExProdData <- ExistingProductsData[-which(ExistingProductsData$Volume %in%
 levels(ExProdData$ProductType)
 # To remove a certain product type rows:
 ExProdData <- ExProdData[ExProdData$ProductType != "ExtendedWarranty", ]
-# To create a new feature/column:
+# To create new features/columns:
 ExProdData["StarWeighted"] <- NA
+ExProdData["TotalStarReviews"] <- NA
 ExProdData$StarWeighted <- as.numeric(ExProdData$StarWeighted)
-# To calculate weighted mean of star reviews for the new column:
+ExProdData$TotalStarReviews <- as.numeric(ExProdData$TotalStarReviews)
+# To calculate total and weighted mean of star reviews for the new columns:
 ExProdData$StarWeighted <- (ExProdData$x5StarReviews*5 +
                               ExProdData$x4StarReviews*4 +
                               ExProdData$x3StarReviews*3 +
                               ExProdData$x2StarReviews*2 +
                               ExProdData$x1StarReviews*1) / rowSums(ExProdData[4:8])
+ExProdData$TotalStarReviews <- rowSums(ExProdData[4:8])
 
 ## Dummifing The Data ----
 # To give binary values to every product type:
@@ -46,9 +49,9 @@ ExProdReady <- data.frame(predict(ExProdDummy, newdata = ExProdData))
 
 ## Feature Selection ----
 # To remove uncorrelated/unrelated variables:
-ExProdReady[,c(1:16, 18:19, 21, 23:28, 30)] <- list(NULL)
-# Selected Variables: "x3StarReviews", "RecommendProduct", "PositiveServiceReview",
-# and "Volume."
+ExProdReady[,c(1:17, 19, 21, 23:28, 30)] <- list(NULL)
+# Selected Variables: "x2StarReviews", "RecommendProduct", "PositiveServiceReview",
+# and "Volume".
 # To see the correlation between features:
 corrData <- cor(ExProdReady)
 corrplot(corrData)
@@ -102,8 +105,8 @@ set.seed(400)
 kNNControl1 <- trainControl(method="repeatedcv", search = "random",
                             repeats = 3) #,classProbs=TRUE,summaryFunction = twoClassSummary)
 kNNModel1 <- train(Volume ~ ., data = trainingset, method = "knn",
-                trControl = kNNControl1, preProcess = c("center","scale"),
-                tuneLength = 20)
+                   trControl = kNNControl1, preProcess = c("center","scale"),
+                   tuneLength = 20)
 kNNModel1
 kNNPredict1 <- predict(kNNModel1, testingset)
 kNNPredict1

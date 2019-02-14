@@ -10,6 +10,13 @@ library(corrplot)
 ## Import Data ----
 ExistingProductsData <- read.csv("existingproductattributes2017.csv")
 
+## Data Exploration ----
+summary(ExistingProductsData)
+str(ExistingProductsData)
+plot(ExistingProductsData$ProductType, ExistingProductsData$x5StarReviews)
+ggplot(ExistingProductsData, aes(x5StarReviews,PositiveServiceReview,
+                                 color = ProductType))+geom_jitter(alpha = 1)
+
 ## Preprocessing ----
 # To remove NA column:
 ExistingProductsData$BestSellersRank <- NULL
@@ -25,13 +32,3 @@ ExProdReady[,c(1:4, 8:9, 11:13)] <- list(NULL)
 corrData <- cor(ExProdReady)
 corrplot(corrData)
 corrData
-
-## ggplot ----
-ggplot(ExProdReady, aes(Volume, Price,
-                        color = as.factor(ProductType.Laptop)))+geom_jitter(alpha = 1)
-ggplot(ExProdReady, aes(Volume, PositiveServiceReview,
-                        color = as.factor(ProductType.Netbook)))+geom_jitter(alpha = 1)
-ggplot(ExProdReady, aes(Volume, PositiveServiceReview,
-                        color = as.factor(ProductType.PC)))+geom_jitter(alpha = 1)
-ggplot(ExProdReady, aes(Volume, PositiveServiceReview,
-                        color = as.factor(ProductType.Smartphone)))+geom_jitter(alpha = 1)
